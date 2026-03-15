@@ -32,15 +32,21 @@ ${hours ? `- Hours: ${hours}` : ''}
 - Design style: ${styleHint || 'sleek modern professional design'}
 
 Requirements:
-1. Output ONLY valid complete HTML from <!DOCTYPE html> to </html>. No markdown, no backticks, no explanation before or after.
-2. Sections: sticky nav, hero with headline + CTA button, services (3-4 cards), why choose us (3 benefits), contact with all provided details, footer.
+1. Output ONLY valid complete HTML from <!DOCTYPE html> to </html>. No markdown, no backticks, no explanation.
+2. Sections: sticky nav, hero with headline + CTA, services (3-4 cards), why choose us (3 benefits), contact with all details, footer.
 3. Match the design style exactly: ${styleHint || 'modern professional'}
-4. Import Google Fonts in <head> — choose fonts that match the style and business personality.
+4. Import Google Fonts in <head> — fonts matching the style and business personality.
 5. All CSS in one <style> tag. No external CSS frameworks.
 6. Fully responsive with mobile-friendly media queries.
-7. Modern design: gradients, shadows, hover effects, smooth animations.
-8. Write realistic compelling copy specific to this business — no generic filler.
-9. Professional agency-quality output.
+7. USE REAL IMAGES — use Unsplash images throughout the page:
+   - Hero: full-width background image using CSS background-image with a dark overlay for text readability
+   - Service/feature cards: each card has a relevant <img> tag (height ~200px, object-fit:cover)
+   - Pick Unsplash photo IDs genuinely relevant to the business type
+   - Example URL format: https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80&fit=crop&auto=format
+   - Use at least 5-6 different images across the page
+8. Modern design: card shadows, hover effects, smooth animations, image overlays.
+9. Compelling realistic copy tailored to this exact business — not generic filler.
+10. Professional agency-quality result that looks like a real handcrafted website.
 
 Start your response immediately with <!DOCTYPE html> and nothing else.`;
 
