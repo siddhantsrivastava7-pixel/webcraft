@@ -1,27 +1,54 @@
+// api/generate.js — Vercel Serverless Function
+// Your Gemini API key lives here on the server. Users never see it.
+
 export default async function handler(req, res) {
+  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  let body = req.body;
-  if (typeof body === 'string') {
-    try { body = JSON.parse(body); } catch(e) { body = {}; }
+  const { name, type, description, location, phone, email, hours, color } = req.body;
+
+  // Basic validation
+  if (!name || !type || !description) {
+    return res.status(400).json({ error: 'Missing required fields: name, type, description' });
   }
 
-  const { prompt } = body || {};
+  const colorMap = {
+    blue: '#1d4ed8', green: '#15803d', orange: '#c2410c',
+    purple: '#6d28d9', pink: '#be185d', slate: '#334155',
+    amber: '#b45309', teal: '#0f766e',
+  };
+  const primaryColor = colorMap[color] || '#1d4ed8';
 
-  if (!prompt || typeof prompt !== 'string') {
-    return res.status(400).json({ error: 'Missing prompt. Body: ' + JSON.stringify(body) });
-  }
+  const prompt = `You are an expert web designer. Create a complete, beautiful, single-page HTML website for a business.
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'GEMINI_API_KEY not set.' });
-  }
+Business Details:
+- Name: ${name}
+- Type: ${type}
+- Description: ${description}
+${location ? `- Location: ${location}` : ''}
+${phone ? `- Phone/WhatsApp: ${phone}` : ''}
+${email ? `- Email: ${email}` : ''}
+${hours ? `- Hours: ${hours}` : ''}
+- Primary brand color: ${primaryColor}
+
+Requirements:
+1. Output ONLY valid complete HTML (<!DOCTYPE html> to </html>). No markdown, no backticks, no explanation.
+2. Sections: sticky nav, hero with headline + CTA, services (3-4 cards), why choose us (3 benefits), contact with details, footer.
+3. Use primary color ${primaryColor} for CTAs, accents, and highlights.
+4. Import Google Fonts in <head> — choose fonts matching the business personality.
+5. All CSS in a <style> tag. No external CSS frameworks.
+6. Fully responsive and mobile-friendly with media queries.
+7. Modern design: gradients, card shadows, smooth hover effects, subtle animations.
+8. Write realistic, compelling copy that fits this specific business type.
+9. Professional agency-quality output.
+
+Output ONLY the HTML. Start with <!DOCTYPE html>`;
 
   try {
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -32,20 +59,36 @@ export default async function handler(req, res) {
       }
     );
 
-    const data = await geminiRes.json();
+    const geminiData = await geminiRes.json();
 
     if (!geminiRes.ok) {
-      return res.status(502).json({ error: 'Gemini: ' + (data.error?.message || JSON.stringify(data)) });
+      const msg = geminiData.error?.message || 'Gemini API error';
+      console.error('Gemini error:', msg);
+      return res.status(500).json({ error: 'AI generation failed. Please try again.' });
     }
 
-    const html = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    if (!html) {
-      return res.status(502).json({ error: 'Empty response: ' + JSON.stringify(data) });
+    const html = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // Log the lead to Google Sheets (fire-and-forget, won't block the response)
+    if (process.env.GOOGLE_SHEET_URL) {
+      fetch(process.env.GOOGLE_SHEET_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          type,
+          phone:    phone    || '',
+          email:    email    || '',
+          location: location || '',
+          date:     new Date().toISOString(),
+        }),
+      }).catch(err => console.error('Sheets logging error (non-fatal):', err));
     }
 
     return res.status(200).json({ html });
 
   } catch (err) {
-    return res.status(500).json({ error: 'Fetch failed: ' + err.message });
+    console.error('Server error:', err);
+    return res.status(500).json({ error: 'Server error. Please try again.' });
   }
 }
