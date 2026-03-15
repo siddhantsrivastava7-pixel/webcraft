@@ -84,7 +84,9 @@ Start your response immediately with <!DOCTYPE html> and nothing else.`;
       return res.status(500).json({ error: `Gemini API error: ${lastError}` });
     }
 
-    const html = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // gemini-2.5-flash returns thinking + response as multiple parts — join them all
+    const parts = geminiData.candidates?.[0]?.content?.parts || [];
+    const html = parts.map(p => p.text || '').join('');
 
     if (!html) {
       return res.status(500).json({ error: 'Gemini returned an empty response. Please try again.' });
