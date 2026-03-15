@@ -38,17 +38,14 @@ Requirements:
 4. Import Google Fonts in <head> — fonts matching the style and business personality.
 5. All CSS in one <style> tag. No external CSS frameworks.
 6. Fully responsive with mobile-friendly media queries.
-7. USE REAL IMAGES using Unsplash Source search URLs (these work by keyword, no ID needed):
-   - Format: https://source.unsplash.com/1600x900/?KEYWORD1,KEYWORD2
-   - Hero: CSS background-image with dark overlay. Use keywords specific to the business e.g:
-     * Energy drink: https://source.unsplash.com/1600x900/?energy,drink,neon
-     * Restaurant: https://source.unsplash.com/1600x900/?restaurant,food
-     * Salon: https://source.unsplash.com/1600x900/?salon,beauty,hair
-     * Gym: https://source.unsplash.com/1600x900/?gym,fitness,workout
-     * Real estate: https://source.unsplash.com/1600x900/?house,property,interior
-   - Service cards: <img src="https://source.unsplash.com/600x400/?RELEVANT_KEYWORD" style="width:100%;height:200px;object-fit:cover">
-   - Use 5-6 images with DIFFERENT sizes (add &sig=1, &sig=2 etc to get different images): https://source.unsplash.com/600x400/?gym,workout&sig=1
-   - ALWAYS match keywords to the actual business type: ${type}
+7. USE REAL IMAGES from picsum.photos (free, always works, no API key needed):
+   - Format: https://picsum.photos/seed/WORD/WIDTH/HEIGHT
+   - The WORD acts as a seed — use descriptive words so different images appear per section
+   - Hero background: style="background-image:url('https://picsum.photos/seed/hero-${type.replace(/\s/g,'-')}/1600/900');background-size:cover;background-position:center;" with a dark rgba overlay div on top for text readability
+   - Service card images: <img src="https://picsum.photos/seed/service1/600/400" style="width:100%;height:220px;object-fit:cover;border-radius:8px 8px 0 0">
+   - Use unique seed words for each image: service1, service2, service3, team, about, contact
+   - Use at least 5-6 images across the full page
+   - ALWAYS wrap hero text in a div with background:rgba(0,0,0,0.55) overlay so text is readable
 8. Nav links MUST use smooth scroll anchor links (#section-id) that stay within the page — NOT href to external pages.
 9. Modern design: card shadows, hover effects, smooth animations, image overlays with rgba backgrounds.
 10. Compelling realistic copy tailored to this exact business — no generic filler.
