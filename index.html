@@ -360,11 +360,12 @@ function renderPreview() {
         <h2>Your <em>website</em> is ready</h2>
         <div class="preview-actions">
           <button class="pbtn" id="edit-btn">← Edit</button>
+          <button class="pbtn" id="open-tab-btn" style="display:none">↗ Open Preview</button>
           <button class="pbtn accent" id="dl-btn">↓ Download HTML</button>
           <button class="pbtn teal" id="live-btn">🌐 Go Live — Free</button>
         </div>
       </div>
-      <div class="browser">
+      <div class="browser" id="preview-container">
         <div class="browser-bar">
           <div class="browser-dots"><span></span><span></span><span></span></div>
           <div class="url-pill">www.${slug}.com</div>
@@ -376,6 +377,9 @@ function renderPreview() {
 }
 
 function bindPreview() {
+  document.getElementById('open-tab-btn').onclick = () => {
+    if(state.previewUrl) window.open(state.previewUrl, '_blank');
+  };
   document.getElementById('edit-btn').onclick = () => {
     document.getElementById('preview-wrap').remove();
     document.getElementById('main-card').style.display='';
@@ -386,10 +390,21 @@ function bindPreview() {
 }
 
 function loadPreview() {
-  const f = document.getElementById('preview-frame');
-  if(!f || !state.generatedHTML) return;
-  // data URI: most reliable approach, no sandbox/same-origin issues
-  f.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(state.generatedHTML);
+  const container = document.getElementById('preview-container');
+  if(!container || !state.generatedHTML) return;
+  // Store in sessionStorage and open in new tab via blob URL
+  try {
+    const blob = new Blob([state.generatedHTML], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const f = document.getElementById('preview-frame');
+    if(f) f.src = url;
+    // Store URL for the open-in-tab button
+    state.previewUrl = url;
+    const openBtn = document.getElementById('open-tab-btn');
+    if(openBtn) openBtn.style.display = 'inline-flex';
+  } catch(e) {
+    console.error('Preview error:', e);
+  }
 }
 
 function downloadHTML() {
