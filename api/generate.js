@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, type, description, location, phone, email, hours, color } = req.body;
+  const { name, type, description, location, phone, email, hours, color, styleHint } = req.body;
 
   // Basic validation
   if (!name || !type || !description) {
@@ -31,12 +31,12 @@ ${location ? `- Location: ${location}` : ''}
 ${phone ? `- Phone/WhatsApp: ${phone}` : ''}
 ${email ? `- Email: ${email}` : ''}
 ${hours ? `- Hours: ${hours}` : ''}
-- Primary brand color: ${primaryColor}
+- Design style: ${styleHint || "modern professional sleek design"}
 
 Requirements:
 1. Output ONLY valid complete HTML (<!DOCTYPE html> to </html>). No markdown, no backticks, no explanation.
 2. Sections: sticky nav, hero with headline + CTA, services (3-4 cards), why choose us (3 benefits), contact with details, footer.
-3. Use primary color ${primaryColor} for CTAs, accents, and highlights.
+3. Match the design style exactly as described above — colors, fonts, and mood.
 4. Import Google Fonts in <head> — choose fonts matching the business personality.
 5. All CSS in a <style> tag. No external CSS frameworks.
 6. Fully responsive and mobile-friendly with media queries.
