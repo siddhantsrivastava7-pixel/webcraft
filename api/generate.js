@@ -3,15 +3,20 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { prompt } = req.body;
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch(e) { body = {}; }
+  }
+
+  const { prompt } = body || {};
 
   if (!prompt || typeof prompt !== 'string') {
-    return res.status(400).json({ error: 'Missing prompt' });
+    return res.status(400).json({ error: 'Missing prompt. Body: ' + JSON.stringify(body) });
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Server is missing API key. Please contact support.' });
+    return res.status(500).json({ error: 'GEMINI_API_KEY not set.' });
   }
 
   try {
@@ -30,20 +35,17 @@ export default async function handler(req, res) {
     const data = await geminiRes.json();
 
     if (!geminiRes.ok) {
-      console.error('Gemini error:', data.error?.message);
-      return res.status(502).json({ error: 'AI service error. Please try again.' });
+      return res.status(502).json({ error: 'Gemini: ' + (data.error?.message || JSON.stringify(data)) });
     }
 
     const html = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
     if (!html) {
-      return res.status(502).json({ error: 'AI returned empty response. Please try again.' });
+      return res.status(502).json({ error: 'Empty response: ' + JSON.stringify(data) });
     }
 
     return res.status(200).json({ html });
 
   } catch (err) {
-    console.error('generate error:', err);
-    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+    return res.status(500).json({ error: 'Fetch failed: ' + err.message });
   }
 }
