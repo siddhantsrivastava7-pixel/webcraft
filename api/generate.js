@@ -38,14 +38,21 @@ Requirements:
 4. Import Google Fonts in <head> — fonts matching the style and business personality.
 5. All CSS in one <style> tag. No external CSS frameworks.
 6. Fully responsive with mobile-friendly media queries.
-7. USE REAL IMAGES from picsum.photos (free, always works, no API key needed):
-   - Format: https://picsum.photos/seed/WORD/WIDTH/HEIGHT
-   - The WORD acts as a seed — use descriptive words so different images appear per section
-   - Hero background: style="background-image:url('https://picsum.photos/seed/hero-${type.replace(/\s/g,'-')}/1600/900');background-size:cover;background-position:center;" with a dark rgba overlay div on top for text readability
-   - Service card images: <img src="https://picsum.photos/seed/service1/600/400" style="width:100%;height:220px;object-fit:cover;border-radius:8px 8px 0 0">
-   - Use unique seed words for each image: service1, service2, service3, team, about, contact
-   - Use at least 5-6 images across the full page
-   - ALWAYS wrap hero text in a div with background:rgba(0,0,0,0.55) overlay so text is readable
+7. USE REAL IMAGES from loremflickr.com — it searches by keyword so images match the business:
+   - Format: https://loremflickr.com/WIDTH/HEIGHT/KEYWORD1,KEYWORD2?lock=NUMBER
+   - The lock number (1-99) ensures different images per card. Change it for each image.
+   - Hero background: style="background-image:url('https://loremflickr.com/1600/900/BUSINESS_KEYWORD?lock=1');background-size:cover;background-position:center;" with a dark rgba(0,0,0,0.55) overlay div for text readability
+   - Service card images: <img src="https://loremflickr.com/600/400/RELEVANT_KEYWORD?lock=N" style="width:100%;height:220px;object-fit:cover;border-radius:8px 8px 0 0">
+   - Match keywords tightly to the business type: ${type}
+     * Restaurant/Cafe → food, restaurant, dining, chef, cuisine
+     * Salon/Beauty → salon, hair, beauty, makeup, skincare
+     * Gym/Fitness → gym, fitness, workout, exercise, training
+     * Real Estate → house, interior, property, architecture, home
+     * Energy Drink → energy, sports, athlete, neon, drink
+     * Photography → camera, photography, portrait, studio, photo
+     * Construction → construction, building, architecture, tools, work
+   - Use at least 5-6 images with different keywords AND different lock numbers (1-20)
+   - ALWAYS wrap hero text in a container with background:rgba(0,0,0,0.55) overlay so text is readable
 8. Nav links MUST use smooth scroll anchor links (#section-id) that stay within the page — NOT href to external pages.
 9. Modern design: card shadows, hover effects, smooth animations, image overlays with rgba backgrounds.
 10. Compelling realistic copy tailored to this exact business — no generic filler.
