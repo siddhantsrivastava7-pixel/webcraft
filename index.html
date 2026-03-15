@@ -369,7 +369,7 @@ function renderPreview() {
           <div class="browser-dots"><span></span><span></span><span></span></div>
           <div class="url-pill">www.${slug}.com</div>
         </div>
-        <iframe id="preview-frame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
+        <iframe id="preview-frame" sandbox="allow-scripts allow-popups allow-forms"></iframe>
       </div>
       <p class="preview-hint">Click <strong>Go Live</strong> to publish free in under 2 minutes — no account needed.</p>
     </div>`;
@@ -387,7 +387,7 @@ function bindPreview() {
 
 function loadPreview() {
   const f = document.getElementById('preview-frame');
-  if(f && state.generatedHTML) f.src = URL.createObjectURL(new Blob([state.generatedHTML],{type:'text/html'}));
+  if(f && state.generatedHTML) f.srcdoc = state.generatedHTML;
 }
 
 function downloadHTML() {
