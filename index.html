@@ -372,6 +372,7 @@ function renderPreview() {
         <iframe id="preview-frame" referrerpolicy="no-referrer-when-downgrade" ></iframe>
       </div>
       <p class="preview-hint">Click <strong>Go Live</strong> to publish free in under 2 minutes — no account needed.</p>
+      <p id="debug-info" style="font-size:11px;color:#636070;text-align:center;margin-top:6px;font-family:monospace"></p>
     </div>`;
 }
 
@@ -387,7 +388,40 @@ function bindPreview() {
 
 function loadPreview() {
   const f = document.getElementById('preview-frame');
-  if(f && state.generatedHTML) f.srcdoc = state.generatedHTML;
+  if(!f) { console.error('No iframe found'); return; }
+  
+  const html = state.generatedHTML;
+  console.log('HTML length:', html.length);
+  console.log('HTML preview:', html.slice(0, 300));
+  const dbg = document.getElementById('debug-info');
+  if(dbg) dbg.textContent = 'HTML received: ' + html.length + ' chars | starts with: ' + html.slice(0,60).replace(/\n/g,' ');
+
+  if(!html || html.length < 100) {
+    f.srcdoc = '<p style="padding:20px;color:red">Error: Empty HTML returned from server</p>';
+    return;
+  }
+
+  // Try srcdoc first
+  try {
+    f.srcdoc = html;
+  } catch(e) {
+    console.error('srcdoc failed:', e);
+  }
+
+  // After 1s, if iframe is still blank, try document.write fallback
+  setTimeout(() => {
+    try {
+      const doc = f.contentDocument || f.contentWindow?.document;
+      if(doc && (!doc.body || doc.body.innerHTML.trim() === '')) {
+        console.log('srcdoc blank, trying document.write...');
+        doc.open();
+        doc.write(html);
+        doc.close();
+      }
+    } catch(e) {
+      console.error('document.write fallback failed:', e);
+    }
+  }, 1000);
 }
 
 function downloadHTML() {
