@@ -369,7 +369,7 @@ function renderPreview() {
           <div class="browser-dots"><span></span><span></span><span></span></div>
           <div class="url-pill">www.${slug}.com</div>
         </div>
-        <iframe id="preview-frame" sandbox="allow-same-origin allow-scripts"></iframe>
+        <iframe id="preview-frame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
       </div>
       <p class="preview-hint">Click <strong>Go Live</strong> to publish free in under 2 minutes — no account needed.</p>
     </div>`;
@@ -429,8 +429,15 @@ async function generateWebsite() {
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error||'Generation failed. Please try again.');
-    let html = (data.html||'').replace(/^```html\n?/i,'').replace(/\n?```$/,'').trim();
-    if(!html.includes('<!DOCTYPE')&&!html.includes('<html')) throw new Error('Invalid response. Please try again.');
+    let html = data.html || '';
+    // Strip markdown code fences if Gemini wrapped the output
+    html = html.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/, '').trim();
+    // Extract just the HTML if there's preamble text before it
+    const doctypeIdx = html.indexOf('<!DOCTYPE');
+    const htmlTagIdx = html.indexOf('<html');
+    const startIdx = doctypeIdx >= 0 ? doctypeIdx : htmlTagIdx;
+    if(startIdx > 0) html = html.slice(startIdx);
+    if(startIdx < 0) throw new Error('Invalid response from AI. Please try again.');
     state.generatedHTML = html;
     state.step = 'preview'; render();
   } catch(err) {
