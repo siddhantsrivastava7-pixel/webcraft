@@ -1,9 +1,4 @@
-// api/generate.js
-// Vercel serverless function — keeps your Gemini API key secret on the server.
-// The frontend calls POST /api/generate and gets back { html: "..." }
-
 export default async function handler(req, res) {
-  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -14,8 +9,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing prompt' });
   }
 
-  // GEMINI_API_KEY is set in Vercel dashboard → Environment Variables
-  // Never hardcode your key here!
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'Server is missing API key. Please contact support.' });
@@ -29,10 +22,7 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            maxOutputTokens: 8192,
-            temperature: 0.7,
-          },
+          generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
         }),
       }
     );
@@ -40,8 +30,7 @@ export default async function handler(req, res) {
     const data = await geminiRes.json();
 
     if (!geminiRes.ok) {
-      const msg = data.error?.message || 'Gemini API error';
-      console.error('Gemini error:', msg);
+      console.error('Gemini error:', data.error?.message);
       return res.status(502).json({ error: 'AI service error. Please try again.' });
     }
 
