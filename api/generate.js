@@ -46,7 +46,7 @@ Start your response immediately with <!DOCTYPE html> and nothing else.`;
 
   try {
     // Try gemini-2.0-flash first, fall back to gemini-1.5-flash
-    const models = ['gemini-2.5-flash-preview-04-17', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
     let geminiData = null;
     let lastError = '';
 
