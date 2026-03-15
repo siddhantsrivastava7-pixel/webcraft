@@ -370,7 +370,15 @@ function renderPreview() {
           <div class="browser-dots"><span></span><span></span><span></span></div>
           <div class="url-pill">www.${slug}.com</div>
         </div>
-        <iframe id="preview-frame" referrerpolicy="no-referrer-when-downgrade" ></iframe>
+        <iframe id="preview-frame" referrerpolicy="no-referrer-when-downgrade" style="display:none"></iframe>
+        <div id="preview-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:440px;gap:14px;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%, rgba(124,108,252,0.18) 0%, transparent 70%);pointer-events:none"></div>
+          <div style="width:80px;height:80px;border-radius:50%;background:rgba(124,108,252,0.12);border:1.5px solid rgba(124,108,252,0.35);display:flex;align-items:center;justify-content:center;font-size:34px;">🌐</div>
+          <p style="font-family:'Fraunces',serif;font-size:28px;font-weight:300;color:#f4f2ee;letter-spacing:-0.3px;text-align:center;">Your <em style="font-style:italic;color:#9d91fd">website</em> is ready</p>
+          <p style="font-size:13px;color:#636070;font-weight:300;text-align:center;max-width:280px;line-height:1.6;">Opens in a new tab so you can scroll and click freely</p>
+          <button onclick="openPreviewTab()" style="margin-top:6px;padding:16px 44px;background:#7c6cfc;color:#fff;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 0 50px rgba(124,108,252,0.5);letter-spacing:0.01em;" onmouseover="this.style.background='#8f81fd';this.style.boxShadow='0 0 60px rgba(124,108,252,0.7)'" onmouseout="this.style.background='#7c6cfc';this.style.boxShadow='0 0 50px rgba(124,108,252,0.5)'">↗ &nbsp; Open Preview in New Tab</button>
+          <p style="font-size:11px;color:#636070;font-weight:300;">Then Download HTML or Go Live when you're happy</p>
+        </div>
       </div>
       <p class="preview-hint">Click <strong>Go Live</strong> to publish free in under 2 minutes — no account needed.</p>
     </div>`;
