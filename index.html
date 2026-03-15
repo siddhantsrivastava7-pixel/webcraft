@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebCraft AI — Free Website Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0d0f; --surface: #16161a; --surface2: #1e1e24;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8; --muted: #888; --accent: #e8c97a;
+    --radius: 14px; --radius-sm: 8px;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px 60px; }
+  .logo { font-family: 'Instrument Serif', serif; font-size: 32px; letter-spacing: -0.5px; color: var(--accent); margin-bottom: 6px; }
+  .tagline { font-size: 13px; color: var(--muted); margin-bottom: 40px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .free-badge { display: inline-block; background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.06em; text-transform: uppercase; margin-left: 8px; vertical-align: middle; }
+  .card { width: 100%; max-width: 580px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 36px 40px; }
+  .step-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 8px; }
+  .card h2 { font-family: 'Instrument Serif', serif; font-size: 26px; font-weight: 400; color: var(--text); margin-bottom: 4px; line-height: 1.2; }
+  .card p.sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-size: 13px; font-weight: 500; color: #aaa; margin-bottom: 6px; }
+  .field input, .field textarea, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; padding: 11px 14px; outline: none; transition: border-color 0.2s; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
+  .field textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+  .field select option { background: #1e1e24; }
+  .colors-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .color-chip { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s; }
+  .color-chip:hover { transform: scale(1.1); }
+  .color-chip.active { border-color: var(--text); transform: scale(1.1); }
+  .btn { width: 100%; padding: 14px; border-radius: var(--radius-sm); border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #1a1408; }
+  .btn-primary:hover:not(:disabled) { background: #f0d68e; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .generating { text-align: center; padding: 20px 0; }
+  .spinner { width: 44px; height: 44px; border: 3px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 20px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .generating h3 { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; margin-bottom: 8px; }
+  .generating p { font-size: 14px; color: var(--muted); }
+  .progress-dots { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); animation: pulse 1.2s ease-in-out infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,100% { background: var(--border2); } 50% { background: var(--accent); } }
+  .preview-section { width: 100%; max-width: 900px; }
+  .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+  .preview-header h2 { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; }
+  .preview-header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-sm { padding: 9px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border2); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .btn-sm.primary { background: var(--accent); color: #1a1408; border-color: var(--accent); }
+  .btn-sm.primary:hover { background: #f0d68e; }
+  .btn-sm.secondary { background: transparent; color: var(--text); }
+  .btn-sm.secondary:hover { background: var(--surface2); }
+  .btn-sm.go-live { background: #00ad9f; color: #fff; border-color: #00ad9f; font-weight: 600; }
+  .btn-sm.go-live:hover { background: #00c4b4; }
+  .browser-chrome { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .browser-bar { background: var(--surface2); padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+  .browser-dots { display: flex; gap: 6px; }
+  .browser-dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--border2); }
+  .url-bar { flex: 1; background: var(--surface); border-radius: 6px; padding: 5px 12px; font-size: 12px; color: var(--muted); border: 1px solid var(--border); }
+  #preview-frame { width: 100%; height: 580px; border: none; background: #fff; display: block; }
+  .error-box { background: rgba(220,50,50,0.1); border: 1px solid rgba(220,50,50,0.3); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 14px; color: #f08080; margin-top: 16px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .overlay-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+  .overlay-box { background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius); padding: 36px 40px; max-width: 480px; width: 100%; position: relative; }
+  .overlay-box h3 { font-family: 'Instrument Serif', serif; font-size: 24px; font-weight: 400; margin-bottom: 6px; }
+  .overlay-box .sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+  .steps-list { list-style: none; margin-bottom: 28px; display: flex; flex-direction: column; gap: 16px; }
+  .steps-list li { display: flex; align-items: flex-start; gap: 14px; }
+  .step-num { width: 30px; height: 30px; min-width: 30px; border-radius: 50%; background: rgba(232,201,122,0.15); border: 1px solid rgba(232,201,122,0.4); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .step-text { padding-top: 4px; }
+  .step-text strong { display: block; font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .step-text span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .netlify-btn { width: 100%; padding: 14px; border-radius: var(--radius-sm); border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; background: #00ad9f; color: #fff; transition: background 0.2s; margin-bottom: 10px; }
+  .netlify-btn:hover { background: #00c4b4; }
+  .close-overlay { position: absolute; top: 16px; right: 18px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
+  .close-overlay:hover { color: var(--text); }
+  .tip-box { background: rgba(255,255,255,0.04); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 10px; }
+  .tip-box strong { color: var(--accent); }
+  @media (max-width: 480px) { .two-col { grid-template-columns: 1fr; } .card { padding: 24px 20px; } .overlay-box { padding: 24px 20px; } }
+</style>
+</head>
+<body>
+
+<div class="logo">WebCraft AI <span class="free-badge">Free</span></div>
+<p class="tagline">Build your business website in 60 seconds</p>
+<div id="app"></div>
+<div id="overlay"></div>
+
+<script>
+const COLORS = [
+  { name:'Ocean', value:'blue', hex:'#2563eb' },
+  { name:'Forest', value:'green', hex:'#16a34a' },
+  { name:'Sunset', value:'orange', hex:'#ea580c' },
+  { name:'Berry', value:'purple', hex:'#7c3aed' },
+  { name:'Rose', value:'pink', hex:'#db2777' },
+  { name:'Slate', value:'slate', hex:'#475569' },
+  { name:'Gold', value:'amber', hex:'#d97706' },
+  { name:'Teal', value:'teal', hex:'#0d9488' },
+];
+const BUSINESS_TYPES = [
+  'Restaurant / Café','Retail Store / Shop','Salon / Spa / Beauty',
+  'Fitness / Gym / Wellness','Professional Services (Lawyer, Accountant, Consultant)',
+  'Healthcare / Medical','Real Estate','Photography / Creative Studio',
+  'Construction / Home Services','Education / Tutoring','Tech / Software','Other',
+];
+
+let state = { step:'form', selectedColor:'blue', formData:{}, generatedHTML:'', showOverlay:false };
+
+function render() {
+  const app = document.getElementById('app');
+  if (state.step==='form') { app.innerHTML = renderForm(); bindForm(); }
+  else if (state.step==='generating') { app.innerHTML = renderGenerating(); }
+  else if (state.step==='preview') { app.innerHTML = renderPreview(); bindPreview(); setTimeout(loadPreview, 100); }
+  renderOverlay();
+}
+
+function renderForm() {
+  const chips = COLORS.map(c =>
+    `<div class="color-chip ${c.value===state.selectedColor?'active':''}" style="background:${c.hex}" data-color="${c.value}" title="${c.name}"></div>`
+  ).join('');
+  const typeOpts = BUSINESS_TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
+  return `
+    <div class="card">
+      <div class="step-label">Tell us about your business</div>
+      <h2>Let's build your website</h2>
+      <p class="sub">Answer a few quick questions — we handle the rest. Free, no account needed.</p>
+      <div class="field"><label>Business name *</label><input type="text" id="f-name" placeholder="e.g. The Golden Fork, Maya's Salon..." value="${state.formData.name||''}"></div>
+      <div class="field"><label>Type of business *</label><select id="f-type"><option value="">Select a category...</option>${typeOpts}</select></div>
+      <div class="field"><label>What do you do? (in your own words) *</label><textarea id="f-desc" placeholder="e.g. We serve homemade Italian food in a cozy family setting. We also do catering...">${state.formData.description||''}</textarea></div>
+      <div class="two-col">
+        <div class="field"><label>City / Location</label><input type="text" id="f-location" placeholder="e.g. Mumbai, Dubai..." value="${state.formData.location||''}"></div>
+        <div class="field"><label>Phone / WhatsApp</label><input type="text" id="f-phone" placeholder="+91 98000 00000" value="${state.formData.phone||''}"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Email address</label><input type="text" id="f-email" placeholder="hello@yourbusiness.com" value="${state.formData.email||''}"></div>
+        <div class="field"><label>Opening hours</label><input type="text" id="f-hours" placeholder="Mon–Sat 9am–8pm" value="${state.formData.hours||''}"></div>
+      </div>
+      <div class="field"><label>Pick a color style</label><div class="colors-row">${chips}</div></div>
+      <div id="error-msg"></div>
+      <button class="btn btn-primary" id="generate-btn">Build My Website →</button>
+    </div>`;
+}
+
+function bindForm() {
+  document.querySelectorAll('.color-chip').forEach(chip => {
+    chip.addEventListener('click', () => { state.selectedColor = chip.dataset.color; render(); });
+  });
+  document.getElementById('generate-btn').addEventListener('click', async () => {
+    const name = document.getElementById('f-name').value.trim();
+    const type = document.getElementById('f-type').value;
+    const description = document.getElementById('f-desc').value.trim();
+    if (!name || !type || !description) {
+      document.getElementById('error-msg').innerHTML = `<div class="error-box">Please fill in your business name, type, and description.</div>`;
+      return;
+    }
+    state.formData = {
+      name, type, description,
+      location: document.getElementById('f-location').value.trim(),
+      phone: document.getElementById('f-phone').value.trim(),
+      email: document.getElementById('f-email').value.trim(),
+      hours: document.getElementById('f-hours').value.trim(),
+      color: state.selectedColor,
+    };
+    state.step = 'generating';
+    render();
+    await generateWebsite();
+  });
+}
+
+function renderGenerating() {
+  return `<div class="card" style="text-align:center;"><div class="generating"><div class="spinner"></div><h3>Building ${state.formData.name||'your website'}...</h3><p>AI is designing your site — about 15 seconds</p><div class="progress-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div>`;
+}
+
+function renderPreview() {
+  const slug = (state.formData.name||'mybusiness').toLowerCase().replace(/[^a-z0-9]/g,'');
+  return `
+    <div class="preview-section">
+      <div class="preview-header">
+        <h2>Your website is ready!</h2>
+        <div class="actions">
+          <button class="btn-sm secondary" id="edit-btn">← Edit</button>
+          <button class="btn-sm primary" id="download-btn">↓ Download HTML</button>
+          <button class="btn-sm go-live" id="golive-btn">🌐 Go Live — Free</button>
+        </div>
+      </div>
+      <div class="browser-chrome">
+        <div class="browser-bar">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="url-bar">www.${slug}.com</div>
+        </div>
+        <iframe id="preview-frame" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-top:12px;text-align:center;">
+        Click <strong style="color:var(--accent)">Go Live</strong> to publish free in under 2 minutes — no account needed.
+      </p>
+    </div>`;
+}
+
+function bindPreview() {
+  document.getElementById('edit-btn').onclick = () => { state.step = 'form'; render(); };
+  document.getElementById('download-btn').onclick = downloadHTML;
+  document.getElementById('golive-btn').onclick = () => { downloadHTML(); setTimeout(() => { state.showOverlay = true; renderOverlay(); }, 400); };
+}
+
+function downloadHTML() {
+  const blob = new Blob([state.generatedHTML], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (state.formData.name||'my-website').toLowerCase().replace(/\s+/g,'-') + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadPreview() {
+  const frame = document.getElementById('preview-frame');
+  if (frame && state.generatedHTML) {
+    const blob = new Blob([state.generatedHTML], { type:'text/html' });
+    frame.src = URL.createObjectURL(blob);
+  }
+}
+
+function renderOverlay() {
+  const el = document.getElementById('overlay');
+  if (!state.showOverlay) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="overlay-backdrop" id="backdrop">
+      <div class="overlay-box">
+        <button class="close-overlay" id="close-overlay">✕</button>
+        <h3>Make your website live</h3>
+        <p class="sub">Free, no account needed, done in 2 minutes.</p>
+        <ol class="steps-list">
+          <li><div class="step-num">1</div><div class="step-text"><strong>Your file was just downloaded</strong><span>Check your Downloads folder for the HTML file.</span></div></li>
+          <li><div class="step-num">2</div><div class="step-text"><strong>Open Netlify Drop</strong><span>Click the button below — it opens <strong style="color:var(--text)">netlify.com/drop</strong> in a new tab.</span></div></li>
+          <li><div class="step-num">3</div><div class="step-text"><strong>Drag & drop your file</strong><span>Drop the HTML file onto the page. You'll get a live link like <strong style="color:var(--text)">your-site.netlify.app</strong> instantly.</span></div></li>
+        </ol>
+        <button class="netlify-btn" id="open-netlify">Open Netlify Drop →</button>
+        <div class="tip-box"><strong>Tip:</strong> Want a custom domain like <em>yourbusiness.com</em>? Create a free Netlify account and connect any domain for ~₹800/year.</div>
+      </div>
+    </div>`;
+  document.getElementById('close-overlay').onclick = () => { state.showOverlay = false; renderOverlay(); };
+  document.getElementById('backdrop').onclick = (e) => { if (e.target.id==='backdrop') { state.showOverlay = false; renderOverlay(); } };
+  document.getElementById('open-netlify').onclick = () => window.open('https://app.netlify.com/drop', '_blank');
+}
+
+async function generateWebsite() {
+  try {
+    // Calls your own backend — API key is kept secret on the server
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state.formData),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Generation failed');
+    let html = data.html || '';
+    html = html.replace(/^```html\n?/i,'').replace(/\n?```$/,'').trim();
+    if (!html.includes('<!DOCTYPE') && !html.includes('<html')) throw new Error('Invalid HTML returned. Please try again.');
+    state.generatedHTML = html;
+    state.step = 'preview';
+    render();
+  } catch(err) {
+    state.step = 'form';
+    render();
+    const eb = document.getElementById('error-msg');
+    if (eb) eb.innerHTML = `<div class="error-box">${err.message}</div>`;
+  }
+}
+
+render();
+</script>
+</body>
+</html>
