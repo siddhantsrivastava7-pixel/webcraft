@@ -1,0 +1,92 @@
+# WebCraft AI
+
+A free AI-powered website builder for small business owners. No coding needed — fill in a form, get a professional website in 20 seconds.
+
+---
+
+## Deploy in 5 minutes (free)
+
+### Step 1 — Get a free Gemini API key
+1. Go to https://aistudio.google.com/apikey
+2. Sign in with any Google account
+3. Click **"Create API Key"**
+4. Copy the key (looks like `AIzaSy...`)
+
+### Step 2 — Put this project on GitHub
+1. Go to https://github.com and create a free account if you don't have one
+2. Click **"New repository"** → name it `webcraft-ai` → click **"Create"**
+3. Upload all these files to the repository:
+   - `index.html`
+   - `api/generate.js`
+   - `package.json`
+   - `vercel.json`
+
+### Step 3 — Deploy on Vercel (free)
+1. Go to https://vercel.com and sign in with your GitHub account
+2. Click **"Add New Project"**
+3. Import your `webcraft-ai` repository
+4. Click **"Deploy"** — Vercel auto-detects everything
+
+### Step 4 — Add your API key
+1. In Vercel, go to your project → **Settings** → **Environment Variables**
+2. Click **"Add New"**
+   - Name: `GEMINI_API_KEY`
+   - Value: paste your key from Step 1
+3. Click **"Save"**
+4. Go to **Deployments** → click **"Redeploy"** to apply the key
+
+### Done!
+Your app is live at `https://your-project-name.vercel.app`
+
+---
+
+## Project structure
+
+```
+webcraft-ai/
+├── index.html        ← The entire frontend (one file)
+├── api/
+│   └── generate.js   ← Backend API (keeps your key secret)
+├── package.json      ← Node config
+├── vercel.json       ← Routing config
+└── README.md         ← This file
+```
+
+---
+
+## How it works
+
+1. User fills in business name, type, description, contact details, and picks a style
+2. Frontend sends the data to `/api/generate` on your server
+3. Your server calls Gemini with your secret API key
+4. Gemini generates a full professional HTML website
+5. User sees a live preview and can download or publish it
+
+The API key never touches the user's browser — it stays safely on the server.
+
+---
+
+## Free tier limits
+
+| Service | Free limit |
+|---------|-----------|
+| Vercel  | 100GB bandwidth/month, 100k function calls/day |
+| Gemini  | 1,500 requests/day, 1M tokens/day |
+
+More than enough for thousands of users per day.
+
+---
+
+## Customisation tips
+
+- **Add your own logo**: Replace the text logo in `index.html` with an `<img>` tag
+- **Change the domain**: In Vercel → Settings → Domains → add your custom domain
+- **Add more styles**: In `index.html`, add entries to the `STYLES` array with a new prompt
+- **Add more business types**: Add entries to the `TYPES` array and `PLACEHOLDERS` object
+- **Track usage**: Add a free analytics tool like Plausible or Umami
+
+---
+
+## Support
+
+Built with Google Gemini AI and deployed on Vercel. Both are free for this use case.
