@@ -38,15 +38,21 @@ Requirements:
 4. Import Google Fonts in <head> — fonts matching the style and business personality.
 5. All CSS in one <style> tag. No external CSS frameworks.
 6. Fully responsive with mobile-friendly media queries.
-7. USE REAL IMAGES — use Unsplash images throughout the page:
-   - Hero: full-width background image using CSS background-image with a dark overlay for text readability
-   - Service/feature cards: each card has a relevant <img> tag (height ~200px, object-fit:cover)
-   - Pick Unsplash photo IDs genuinely relevant to the business type
-   - Example URL format: https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80&fit=crop&auto=format
-   - Use at least 5-6 different images across the page
-8. Modern design: card shadows, hover effects, smooth animations, image overlays.
-9. Compelling realistic copy tailored to this exact business — not generic filler.
-10. Professional agency-quality result that looks like a real handcrafted website.
+7. USE REAL IMAGES using Unsplash Source search URLs (these work by keyword, no ID needed):
+   - Format: https://source.unsplash.com/1600x900/?KEYWORD1,KEYWORD2
+   - Hero: CSS background-image with dark overlay. Use keywords specific to the business e.g:
+     * Energy drink: https://source.unsplash.com/1600x900/?energy,drink,neon
+     * Restaurant: https://source.unsplash.com/1600x900/?restaurant,food
+     * Salon: https://source.unsplash.com/1600x900/?salon,beauty,hair
+     * Gym: https://source.unsplash.com/1600x900/?gym,fitness,workout
+     * Real estate: https://source.unsplash.com/1600x900/?house,property,interior
+   - Service cards: <img src="https://source.unsplash.com/600x400/?RELEVANT_KEYWORD" style="width:100%;height:200px;object-fit:cover">
+   - Use 5-6 images with DIFFERENT sizes (add &sig=1, &sig=2 etc to get different images): https://source.unsplash.com/600x400/?gym,workout&sig=1
+   - ALWAYS match keywords to the actual business type: ${type}
+8. Nav links MUST use smooth scroll anchor links (#section-id) that stay within the page — NOT href to external pages.
+9. Modern design: card shadows, hover effects, smooth animations, image overlays with rgba backgrounds.
+10. Compelling realistic copy tailored to this exact business — no generic filler.
+11. Professional agency-quality result that looks like a real handcrafted website.
 
 Start your response immediately with <!DOCTYPE html> and nothing else.`;
 
@@ -86,7 +92,10 @@ Start your response immediately with <!DOCTYPE html> and nothing else.`;
 
     // gemini-2.5-flash returns thinking + response as multiple parts — join them all
     const parts = geminiData.candidates?.[0]?.content?.parts || [];
-    const html = parts.map(p => p.text || '').join('');
+    let html = parts.map(p => p.text || '').join('');
+    
+    // Inject <base target="_self"> so nav links scroll within iframe, not escape to parent
+    html = html.replace('<head>', '<head><base target="_self">');
 
     if (!html) {
       return res.status(500).json({ error: 'Gemini returned an empty response. Please try again.' });
