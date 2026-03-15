@@ -377,9 +377,7 @@ function renderPreview() {
 }
 
 function bindPreview() {
-  document.getElementById('open-tab-btn').onclick = () => {
-    if(state.previewUrl) window.open(state.previewUrl, '_blank');
-  };
+  document.getElementById('open-tab-btn').onclick = openPreviewTab;
   document.getElementById('edit-btn').onclick = () => {
     document.getElementById('preview-wrap').remove();
     document.getElementById('main-card').style.display='';
@@ -390,21 +388,24 @@ function bindPreview() {
 }
 
 function loadPreview() {
-  const container = document.getElementById('preview-container');
-  if(!container || !state.generatedHTML) return;
-  // Store in sessionStorage and open in new tab via blob URL
-  try {
-    const blob = new Blob([state.generatedHTML], {type: 'text/html'});
-    const url = URL.createObjectURL(blob);
-    const f = document.getElementById('preview-frame');
-    if(f) f.src = url;
-    // Store URL for the open-in-tab button
-    state.previewUrl = url;
-    const openBtn = document.getElementById('open-tab-btn');
-    if(openBtn) openBtn.style.display = 'inline-flex';
-  } catch(e) {
-    console.error('Preview error:', e);
-  }
+  // Replace iframe with a click-to-preview panel — avoids all CSP/sandbox issues
+  const f = document.getElementById('preview-frame');
+  if(!f) return;
+  f.style.display = 'none';
+  const placeholder = document.getElementById('preview-placeholder');
+  if(placeholder) placeholder.style.display = 'flex';
+  // Show open tab button
+  const openBtn = document.getElementById('open-tab-btn');
+  if(openBtn) openBtn.style.display = 'inline-flex';
+}
+
+function openPreviewTab() {
+  // Write directly to a new window — bypasses all CSP and blob URL restrictions
+  const w = window.open('', '_blank');
+  if(!w) { alert('Please allow popups for this site to preview your website.'); return; }
+  w.document.open();
+  w.document.write(state.generatedHTML);
+  w.document.close();
 }
 
 function downloadHTML() {
