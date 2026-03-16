@@ -22,51 +22,121 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields: name, type, description' });
   }
 
-  const prompt = `You are an expert web designer. Create a complete, beautiful, single-page HTML website for a business.
+  // Pick tightly relevant image keywords based on business type
+  const imageKeywords = getImageKeywords(type);
 
-Business Details:
+  const prompt = `You are a world-class web designer. Create a stunning, complete, single-page HTML website.
+
+BUSINESS INFO:
 - Name: ${name}
 - Type: ${type}
 - Description: ${description}
 ${location ? `- Location: ${location}` : ''}
 ${phone ? `- Phone/WhatsApp: ${phone}` : ''}
 ${email ? `- Email: ${email}` : ''}
-${hours ? `- Hours: ${hours}` : ''}
-- Design style: ${styleHint || 'sleek modern professional design'}
+${hours ? `- Business Hours: ${hours}` : ''}
+- Visual style: ${styleHint || 'sleek modern professional'}
 
-Requirements:
-1. Output ONLY valid complete HTML from <!DOCTYPE html> to </html>. No markdown, no backticks, no explanation.
-2. Sections: sticky nav, hero with headline + CTA, services (3-4 cards), why choose us (3 benefits), contact with all details, footer.
-3. Match the design style exactly: ${styleHint || 'modern professional'}
-4. Import Google Fonts in <head> — fonts matching the style and business personality.
-5. All CSS in one <style> tag. No external CSS frameworks.
-6. Fully responsive with mobile-friendly media queries.
-7. USE REAL IMAGES from loremflickr.com — it searches by keyword so images match the business:
-   - Format: https://loremflickr.com/WIDTH/HEIGHT/KEYWORD1,KEYWORD2?lock=NUMBER
-   - The lock number (1-99) ensures different images per card. Change it for each image.
-   - Hero background: style="background-image:url('https://loremflickr.com/1600/900/BUSINESS_KEYWORD?lock=1');background-size:cover;background-position:center;" with a dark rgba(0,0,0,0.55) overlay div for text readability
-   - Service card images: <img src="https://loremflickr.com/600/400/RELEVANT_KEYWORD?lock=N" style="width:100%;height:220px;object-fit:cover;border-radius:8px 8px 0 0">
-   - Match keywords tightly to the business type: ${type}
-     * Restaurant/Cafe → food, restaurant, dining, chef, cuisine
-     * Salon/Beauty → salon, hair, beauty, makeup, skincare
-     * Gym/Fitness → gym, fitness, workout, exercise, training
-     * Real Estate → house, interior, property, architecture, home
-     * Photography → camera, photography, portrait, studio, photo
-     * Construction → construction, building, architecture, tools, work
-   - Use at least 5-6 images with different keywords AND different lock numbers (1-20)
-   - ALWAYS wrap hero text in a container with background:rgba(0,0,0,0.55) overlay so text is readable
-8. Nav links MUST use smooth scroll anchor links (#section-id) that stay within the page — NOT href to external pages.
-9. Modern design: card shadows, hover effects, smooth animations, image overlays with rgba backgrounds.
-10. Compelling realistic copy tailored to this exact business — no generic filler.
-11. Professional agency-quality result that looks like a real handcrafted website.
-12. Do NOT include any <base> tag.
+════════════════════════════════════════
+SECTION STRUCTURE (in this exact order)
+════════════════════════════════════════
 
-Start your response immediately with <!DOCTYPE html> and nothing else.`;
+1. STICKY NAV
+   - Logo (business name) on the left
+   - Nav links on the right: Home, Services, About, Contact
+   - Smooth scroll to anchor IDs
+   - Solid background color (not transparent), subtle bottom border
+   - z-index: 1000
+
+2. HERO SECTION  ← READ CAREFULLY
+   - Full-viewport-height (min-height: 100vh)
+   - Background: a loremflickr image using this exact format:
+     background-image: url('https://loremflickr.com/1400/900/${imageKeywords.hero}?lock=10')
+   - ALWAYS add a dark overlay using a child div with:
+     position:absolute; inset:0; background:rgba(0,0,0,0.55);
+   - Hero content sits ABOVE the overlay using position:relative; z-index:2
+   - Layout: centered vertically and horizontally using flexbox (flex-direction:column; align-items:center; justify-content:center; text-align:center)
+   - NEVER position the headline and paragraph side-by-side — stack them vertically
+   - Headline: large (clamp(2.5rem, 6vw, 4.5rem)), bold, white, max 6 words
+   - Subheadline: 1.1rem, white/80%, max-width:560px, centered
+   - ONE centered CTA button below the subheadline — no floating buttons
+   - Add a subtle scroll indicator arrow at the bottom
+
+3. SERVICES SECTION (id="services")
+   - Section title + short subtitle centered at the top
+   - 3-column card grid (responsive: 1 col on mobile)
+   - Each card: image on top, title, short description, subtle hover lift
+   - Card images: https://loremflickr.com/600/380/${imageKeywords.card}?lock=N
+     Use lock=21, lock=22, lock=23 for the three cards
+   - Cards have rounded corners, box-shadow, clean white/light background
+
+4. WHY CHOOSE US (id="about")
+   - Alternating layout OR 3-column icon grid
+   - 3 strong benefit points with icons (use Unicode or simple SVG icons)
+   - Clean light background (slightly off-white or tinted)
+
+5. CONTACT SECTION (id="contact")
+   - Display: phone, email, location, hours — each with an icon
+   - Optional: simple HTML/CSS contact form (name, email, message, send button)
+   - Map placeholder or a stylish address card
+
+6. FOOTER
+   - Business name, tagline, nav links, copyright
+   - Dark background
+
+════════════════════════════════════════
+DESIGN RULES
+════════════════════════════════════════
+
+TYPOGRAPHY:
+- Import 2 Google Fonts that match the style: ${styleHint}
+  * One display font for headings (e.g. Playfair Display, Montserrat, Space Grotesk)
+  * One body font (e.g. Inter, DM Sans, Nunito)
+- Heading sizes: h1 clamp(2.5rem,6vw,4.5rem) / h2 2rem / h3 1.25rem
+- Body: 1rem, line-height 1.7, color #444
+
+COLORS — based on style "${styleHint}":
+- Define --primary, --primary-dark, --accent, --bg, --bg-alt as CSS variables
+- Use them consistently throughout
+
+IMAGES — CRITICAL RULES:
+- ONLY use loremflickr.com. Format: https://loremflickr.com/WIDTH/HEIGHT/KEYWORD?lock=N
+- Keywords MUST be specific to this business type. Use ONLY these pre-selected keywords:
+  Hero keyword:  "${imageKeywords.hero}"
+  Card keyword:  "${imageKeywords.card}"
+  Extra keyword: "${imageKeywords.extra}"
+- NEVER substitute generic keywords like "business", "woman", "drink", "people", "laptop"
+- Use a unique lock number (1–99) for EVERY image so they all look different
+- All card images must use the same dimensions: 600x380
+- Hero image must be: 1400x900
+
+LAYOUT & SPACING:
+- Section padding: 80px top/bottom (40px mobile)
+- Max content width: 1100px, centered with margin:auto
+- Card grid gap: 28px
+- Use CSS custom properties for all repeated values
+
+INTERACTIONS:
+- Smooth scroll: html { scroll-behavior: smooth }
+- Nav link hover: color change + underline animation
+- Card hover: translateY(-6px) + deeper shadow (transition 0.3s ease)
+- CTA button hover: scale(1.03) + shadow
+- Fade-in animation on sections using @keyframes fadeInUp
+
+TECHNICAL:
+- Single HTML file, all CSS in <style>, no external frameworks
+- Do NOT include any <base> tag anywhere
+- Fully responsive — mobile-first, breakpoints at 768px and 480px
+- Sticky nav height ~70px — add padding-top:70px to the hero so content is not hidden under nav
+- All section anchor id attributes must match nav href values exactly
+
+OUTPUT FORMAT:
+Output ONLY the HTML. Start with <!DOCTYPE html> on the very first line. End with </html> on the last line. No markdown. No backticks. No commentary before or after.`;
 
   let html = null;
   let lastError = '';
 
-  // ── 1. Try Groq first (free, fast) ──────────────────────────────────────
+  // ── 1. Try Groq first ────────────────────────────────────────────────────
   if (hasGroq) {
     try {
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -79,7 +149,13 @@ Start your response immediately with <!DOCTYPE html> and nothing else.`;
           model: 'llama-3.3-70b-versatile',
           max_tokens: 8192,
           temperature: 0.7,
-          messages: [{ role: 'user', content: prompt }],
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert web designer. Output only complete valid HTML files. Never use markdown fences. Never add any text before <!DOCTYPE html> or after </html>.'
+            },
+            { role: 'user', content: prompt }
+          ],
         }),
       });
 
@@ -97,7 +173,7 @@ Start your response immediately with <!DOCTYPE html> and nothing else.`;
     }
   }
 
-  // ── 2. Fallback to Gemini if Groq failed or not configured ──────────────
+  // ── 2. Fallback to Gemini ────────────────────────────────────────────────
   if (!html && hasGemini) {
     const models = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash'];
 
@@ -136,21 +212,19 @@ Start your response immediately with <!DOCTYPE html> and nothing else.`;
     return res.status(500).json({ error: `AI generation failed: ${lastError}` });
   }
 
-  // ── Clean up the response ────────────────────────────────────────────────
-  // Strip markdown fences if the model wrapped output
+  // ── Clean up response ────────────────────────────────────────────────────
   html = html.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/, '').trim();
 
-  // Extract from <!DOCTYPE if there's preamble text
   const doctypeIdx = html.indexOf('<!DOCTYPE');
   const htmlTagIdx = html.indexOf('<html');
   const startIdx   = doctypeIdx >= 0 ? doctypeIdx : htmlTagIdx;
   if (startIdx > 0)  html = html.slice(startIdx);
   if (startIdx < 0)  return res.status(500).json({ error: 'Invalid response from AI. Please try again.' });
 
-  // Remove any <base> tag the model may have added (breaks blob preview)
+  // Remove any <base> tag — breaks blob:// preview
   html = html.replace(/<base[^>]*>/gi, '');
 
-  // ── Log lead to Google Sheets (fire-and-forget) ──────────────────────────
+  // ── Log to Google Sheets ─────────────────────────────────────────────────
   if (process.env.GOOGLE_SHEET_URL) {
     fetch(process.env.GOOGLE_SHEET_URL, {
       method: 'POST',
@@ -166,4 +240,46 @@ Start your response immediately with <!DOCTYPE html> and nothing else.`;
   }
 
   return res.status(200).json({ html });
+}
+
+// ── Image keyword map by business type ──────────────────────────────────────
+function getImageKeywords(type) {
+  const t = (type || '').toLowerCase();
+
+  if (t.includes('restaurant') || t.includes('café') || t.includes('cafe') || t.includes('food')) {
+    return { hero: 'restaurant,dining,food', card: 'food,dish,cuisine', extra: 'chef,cooking,kitchen' };
+  }
+  if (t.includes('salon') || t.includes('spa') || t.includes('beauty')) {
+    return { hero: 'salon,beauty,hair', card: 'haircut,beauty,skincare', extra: 'makeup,spa,treatment' };
+  }
+  if (t.includes('fitness') || t.includes('gym') || t.includes('wellness')) {
+    return { hero: 'gym,fitness,workout', card: 'exercise,training,weights', extra: 'athlete,running,sport' };
+  }
+  if (t.includes('real estate') || t.includes('property')) {
+    return { hero: 'house,architecture,home', card: 'interior,living,room', extra: 'property,building,estate' };
+  }
+  if (t.includes('photography') || t.includes('creative') || t.includes('studio')) {
+    return { hero: 'photography,camera,studio', card: 'portrait,photo,lens', extra: 'creative,art,shoot' };
+  }
+  if (t.includes('construction') || t.includes('home services') || t.includes('contractor')) {
+    return { hero: 'construction,building,architecture', card: 'tools,renovation,work', extra: 'house,repair,contractor' };
+  }
+  if (t.includes('healthcare') || t.includes('medical') || t.includes('clinic') || t.includes('doctor')) {
+    return { hero: 'hospital,medical,healthcare', card: 'doctor,clinic,health', extra: 'medicine,care,patient' };
+  }
+  if (t.includes('education') || t.includes('tutoring') || t.includes('school')) {
+    return { hero: 'education,classroom,learning', card: 'study,books,school', extra: 'student,teaching,knowledge' };
+  }
+  if (t.includes('tech') || t.includes('software') || t.includes('it')) {
+    return { hero: 'technology,computer,digital', card: 'software,coding,tech', extra: 'innovation,data,network' };
+  }
+  if (t.includes('retail') || t.includes('shop') || t.includes('store')) {
+    return { hero: 'retail,shop,store', card: 'shopping,products,market', extra: 'boutique,fashion,display' };
+  }
+  if (t.includes('law') || t.includes('legal') || t.includes('lawyer') || t.includes('professional')) {
+    return { hero: 'office,professional,business', card: 'law,legal,justice', extra: 'consulting,meeting,corporate' };
+  }
+
+  // Generic fallback
+  return { hero: 'business,professional,office', card: 'work,team,service', extra: 'success,corporate,meeting' };
 }
