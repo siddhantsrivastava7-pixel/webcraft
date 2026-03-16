@@ -396,24 +396,21 @@ function bindPreview() {
 }
 
 function loadPreview() {
-  // Replace iframe with a click-to-preview panel — avoids all CSP/sandbox issues
   const f = document.getElementById('preview-frame');
   if(!f) return;
   f.style.display = 'none';
   const placeholder = document.getElementById('preview-placeholder');
   if(placeholder) placeholder.style.display = 'flex';
-  // Show open tab button
   const openBtn = document.getElementById('open-tab-btn');
   if(openBtn) openBtn.style.display = 'inline-flex';
 }
 
+// FIXED: Use Blob URL instead of document.write() — works reliably across all browsers
 function openPreviewTab() {
-  // Write directly to a new window — bypasses all CSP and blob URL restrictions
-  const w = window.open('', '_blank');
-  if(!w) { alert('Please allow popups for this site to preview your website.'); return; }
-  w.document.open();
-  w.document.write(state.generatedHTML);
-  w.document.close();
+  const blob = new Blob([state.generatedHTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if (!w) { alert('Please allow popups for this site to preview your website.'); }
 }
 
 function downloadHTML() {
